@@ -28,3 +28,11 @@ If you want to lock a particular sub-directory, you can do that as well:
 ```
 dirtydir lock somedir
 ```
+
+== Installation
+
+After cloning, install using:
+
+```
+sudo python3 setup.py install
+```

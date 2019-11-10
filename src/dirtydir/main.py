@@ -104,7 +104,6 @@ def lock_subfolder(subfolder):
 
 def main():
     arguments = docopt(__doc__, version=__version__)
-    print(arguments)
 
     if arguments['--only-clean'] and arguments['--only-dirty']:
         print("--only-clean and --only-dirty flags are mutually exclusive", file=sys.stderr)
@@ -121,7 +120,7 @@ def main():
     if arguments["ls"]:
         list_dir(output_changed, arguments['--verbose'])
     elif arguments["lock"]:
-        if '--all' in arguments:
+        if arguments['--all']:
             for subfolder in list_subfolders():
                 lock_subfolder(subfolder)
         else:
