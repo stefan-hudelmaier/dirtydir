@@ -67,12 +67,25 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
               'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.mathjax',
               'sphinx.ext.napoleon']
+extensions.append('recommonmark')
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+
+# To configure AutoStructify
+def setup(app):
+    from recommonmark.transform import AutoStructify
+    app.add_config_value('recommonmark_config', {
+        'auto_toc_tree_section': 'Contents',
+        'enable_eval_rst': True,
+        'enable_math': True,
+        'enable_inline_math': True
+    }, True)
+    app.add_transform(AutoStructify)
+
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
