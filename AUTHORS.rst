@@ -2,4 +2,4 @@
 Contributors
 ============
 
-* Stefan Hudelmaier <stefan.hudelmaier@device-insight.com>
+* Stefan Hudelmaier <hudelmaier@gmail.com>

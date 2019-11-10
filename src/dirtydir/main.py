@@ -3,7 +3,7 @@
 """dirtydir.
 
 Usage:
-  dirtydir ls [--only-dirty] [--only-clean]
+  dirtydir ls [--only-dirty] [--only-clean] [--verbose]
   dirtydir lock <subdirectory>
   dirtydir lock --all
   dirtydir (-h | --help)
@@ -12,6 +12,7 @@ Usage:
 Options:
   -h --help     Show this screen.
   --version     Show version.
+  --verbose     Produce verbose output.
 
 """
 from docopt import docopt
@@ -52,20 +53,23 @@ def calculate_hash(folder):
 def read_persisted_hashes():
     if os.path.exists(PERSISTENCE_FILENAME):
         with open(PERSISTENCE_FILENAME) as persistent_file:
-            result = json.loads(persistent_file.read())
-            print(result)
-            return result
+            return json.loads(persistent_file.read())
 
     return {}
 
 
 def persist_hashes(hashes):
-    with open(PERSISTENCE_FILENAME) as out:
+    with open(PERSISTENCE_FILENAME, "w") as out:
         out.write(json.dumps(hashes, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
-def list_dir(output_changed):
-    subfolders = [f.name for f in os.scandir(".") if f.is_dir() and not f.name.startswith(".")]
+def list_subfolders():
+    return [f.name for f in os.scandir(".") if f.is_dir() and not f.name.startswith(".")]
+
+
+def list_dir(output_changed, verbose):
+
+    subfolders = list_subfolders()
 
     changed_subfolders = []
     unchanged_subfolders = []
@@ -77,7 +81,8 @@ def list_dir(output_changed):
 
         calculated_hash = calculate_hash(subfolder)
 
-        print("%s %s %s" % (subfolder, hash_value, calculated_hash))
+        if verbose:
+            print("subfolder: %s: persisted: %s, current: %s" % (subfolder, hash_value, calculated_hash), file=sys.stderr)
 
         if hash_value == calculated_hash:
             unchanged_subfolders.append(subfolder)
@@ -99,6 +104,7 @@ def lock_subfolder(subfolder):
 
 def main():
     arguments = docopt(__doc__, version=__version__)
+    print(arguments)
 
     if arguments['--only-clean'] and arguments['--only-dirty']:
         print("--only-clean and --only-dirty flags are mutually exclusive", file=sys.stderr)
@@ -113,10 +119,13 @@ def main():
         output_changed = True
 
     if arguments["ls"]:
-        list_dir(output_changed)
+        list_dir(output_changed, arguments['--verbose'])
     elif arguments["lock"]:
-        # TODO: Support --all flag
-        lock_subfolder(arguments['<subdirectory>'])
+        if '--all' in arguments:
+            for subfolder in list_subfolders():
+                lock_subfolder(subfolder)
+        else:
+            lock_subfolder(arguments['<subdirectory>'])
 
 
 if __name__ == "__main__":
