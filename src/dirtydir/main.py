@@ -63,13 +63,13 @@ def persist_hashes(hashes):
         out.write(json.dumps(hashes, sort_keys=True, indent=2, separators=(',', ': ')))
 
 
-def list_subfolders():
+def list_all_subfolders():
     return [f.name for f in os.scandir(".") if f.is_dir() and not f.name.startswith(".")]
 
 
-def list_dir(output_changed, verbose):
+def list_subfolders(verbose):
 
-    subfolders = list_subfolders()
+    subfolders = list_all_subfolders()
 
     changed_subfolders = []
     unchanged_subfolders = []
@@ -89,10 +89,7 @@ def list_dir(output_changed, verbose):
         else:
             changed_subfolders.append(subfolder)
 
-    list_to_output = changed_subfolders if output_changed else unchanged_subfolders
-
-    for subfolder in list_to_output:
-        print(subfolder)
+    return changed_subfolders, unchanged_subfolders
 
 
 def lock_subfolder(subfolder):
@@ -118,10 +115,14 @@ def main():
         output_changed = True
 
     if arguments["ls"]:
-        list_dir(output_changed, arguments['--verbose'])
+        changed_subfolders, unchanged_subfolders = list_subfolders(arguments['--verbose'])
+        list_to_output = changed_subfolders if output_changed else unchanged_subfolders
+
+        for subfolder in list_to_output:
+            print(subfolder)
     elif arguments["lock"]:
         if arguments['--all']:
-            for subfolder in list_subfolders():
+            for subfolder in list_all_subfolders():
                 lock_subfolder(subfolder)
         else:
             lock_subfolder(arguments['<subdirectory>'])

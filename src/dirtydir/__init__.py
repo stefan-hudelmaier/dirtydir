@@ -14,13 +14,9 @@ finally:
 from dirtydir import main
 
 
-def list_changed():
-    main.list_dir(True, verbose=False)
+def list_subdirs():
+    return main.list_subfolders(verbose=False)
 
 
-def list_unchanged():
-    main.list_dir(False, verbose=False)
-
-
-def lock_subfolder(subfolder):
+def lock_subdir(subfolder):
     main.lock_subfolder(subfolder)
